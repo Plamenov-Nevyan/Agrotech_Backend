@@ -1,11 +1,13 @@
 require('dotenv').config({ path:'./src/config/.env'})
 const app = require('express')()
 const routes = require('./src/routes')
+const isAuth = require('./src/middlewares/isAuth')
 const dbConnect = require('./src/config/mongoDB')
 const port = process.env.PORT || 3000
 
 require('./src/config/express')(app)
 
+app.use(isAuth)
 app.use(routes)
 
 dbConnect()

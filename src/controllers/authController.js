@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const {registerUser, createSession} = require('../services/authServices')
+const {registerUser, createSession, loginUser} = require('../services/authServices')
 const authValidator = require('../middlewares/authValidator')
 
 
@@ -14,6 +14,15 @@ router.post('/register', authValidator, (req, res) => {
      res.json(userData)
     })
   .catch(err => res.json({message: err.message}))
+})
+
+router.post('/login', authValidator,(req,res) => {
+ loginUser(req.body.email)
+ .then((user) => {
+    let userData = createSession(user)
+    res.json(userData)
+ })
+ .catch(err => res.json({message: err.message}))
 })
 
 module.exports = router

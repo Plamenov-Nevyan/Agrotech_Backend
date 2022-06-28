@@ -21,13 +21,27 @@ exports.registerUser = async (username,email, password) => {
         }
 }
 
+exports.loginUser = (email) => User.findOne({email})
+
 exports.createSession = (user) => {
     let payload = Object.assign({}, user)
     let accessToken = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn:'1d'})
     return {
-        username: user.username,
         email: user.email,
         _id: user._id,
         accessToken
     }
+}
+
+exports.ifUserIsRegistered = async(email, password) => {
+    let isInfoCorrect = true
+    let user = await User.findOne({email})
+   if(user){
+    let isPassCorrect = await bcrypt.compare(password, user.password)
+     if(!isPassCorrect){isInfoCorrect = false}
+   }
+   else{
+    isInfoCorrect = false
+   }
+  return isInfoCorrect
 }

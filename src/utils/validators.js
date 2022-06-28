@@ -6,3 +6,7 @@ exports.isPasswordValid = (password, rePassword) => {
         }
     }
 }
+
+exports.areFieldsEmpty = (fields) => {
+    if(fields.includes(``)){throw new Error('Please enter the required information...')}
+}

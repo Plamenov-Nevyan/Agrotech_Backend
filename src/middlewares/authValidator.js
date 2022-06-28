@@ -1,18 +1,37 @@
-const {isPasswordValid} = require('../utils/validators')
-const {ifUserExists} = require('../services/authServices')
+const {isPasswordValid, areFieldsEmpty} = require('../utils/validators')
+const {ifUserExists, ifUserIsRegistered} = require('../services/authServices')
 
 module.exports = async (req, res, next) => {
-    try{
-        let [isUsernameTaken, isEmailTaken] = await ifUserExists(req.body.username, req.body.email)
-        if(isUsernameTaken){
-            throw new Error('Username is already taken...')
+ try{   
+    await validatorHandlers[req.path](req.body)
+    next()
+}catch(err){ res.status(403).json({message: err.message})}
+}
+
+const validatorHandlers = {
+    '/register': async function(reqBody){
+        try{
+            areFieldsEmpty([reqBody.username, reqBody.email, reqBody.password, reqBody.rePassword])
+            let [isUsernameTaken, isEmailTaken] = await ifUserExists(reqBody.username, reqBody.email)
+            if(isUsernameTaken){
+                throw new Error('Username is already taken...')
+            }
+            else if(isEmailTaken){
+                throw new Error('Email is already taken...')
+            }
+            isPasswordValid()
+        }catch(err){
+           throw err
         }
-        else if(isEmailTaken){
-            throw new Error('Email is already taken...')
-        }
-        isPasswordValid()
-        next()
-    }catch(err){
-        res.status(403).json({message: err.message})
-    }
+   },
+   '/login': async function(reqBody){
+       try{
+        areFieldsEmpty([reqBody.email, reqBody.password])
+        let isInfoCorrect = await ifUserIsRegistered(reqBody.email, reqBody.password)
+        if(!isInfoCorrect){throw new Error('Email and/or password is incorrect...')}
+       }
+       catch(err){
+        throw err
+       }
+   }
 }

@@ -24,12 +24,15 @@ exports.registerUser = async (username,email, password) => {
 exports.loginUser = (email) => User.findOne({email})
 
 exports.createSession = (user) => {
-    let payload = Object.assign({}, user)
+    let payload = {...user._doc}
     let accessToken = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn:'1d'})
+    console.log(accessToken)
     return {
-        email: user.email,
-        _id: user._id,
-        accessToken
+        username: payload.username,
+        email: payload.email,
+        _id: payload._id,
+        accessToken,
+        shoppingCart: []
     }
 }
 

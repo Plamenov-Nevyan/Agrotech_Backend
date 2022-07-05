@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
 })
 
 router.post('/register', authValidator, (req, res) => {
-   registerUser(req.body.username, req.body.email, req.body.password, req.body.rePassword)
+   registerUser(req.body.username, req.body.email, req.body.password)
   .then((user) =>{
      let userData = createSession(user)
      res.json(userData)

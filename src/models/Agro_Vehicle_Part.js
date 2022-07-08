@@ -1,6 +1,9 @@
 const {Schema, model, Types} = require('mongoose')
 
 const vehiclesAndPartsSchema = new Schema({
+    type: {
+        type: String
+    },
     brand : {
         type: String,
         required: [true, 'Vehicle/part brand is required !']

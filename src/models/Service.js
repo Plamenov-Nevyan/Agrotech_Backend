@@ -1,6 +1,10 @@
 const {Schema, model, Types} = require('mongoose')
 
 const serviceSchema = new Schema({
+    name : {
+        type: String,
+        required: [true, 'Name of service offered is required !']
+    },
     type : {
         type: String,
         required: [true, 'Type of service offered is required !']

@@ -26,7 +26,6 @@ exports.loginUser = (email) => User.findOne({email})
 exports.createSession = (user) => {
     let payload = {...user._doc}
     let accessToken = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn:'1d'})
-    console.log(accessToken)
     return {
         username: payload.username,
         email: payload.email,

@@ -16,10 +16,9 @@ router.post('/create', upload.single('upload'), async (req,res) => {
 })
 router.get('/marketplace', async (req, res) => {
   try{ 
-    let [Products, VehiclesAndParts, Services] = await getServices.getAllPublications()
-    console.log(Products)
-    let allPublications = Products.concat(VehiclesAndParts, Services)
-    res.json(allPublications)
+    let publications =  await getServices.getAllPublications()
+    console.log(publications)
+    res.json(publications)
   }catch(err){
     res.json({message: err.message})
   }

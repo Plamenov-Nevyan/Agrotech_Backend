@@ -1,10 +1,17 @@
 const router = require('express').Router()
 const {registerUser, createSession, loginUser} = require('../services/authServices')
 const authValidator = require('../middlewares/authValidator')
+const {getNews} = require('../services/newsService')
 
 
 router.get('/', (req, res) => {
-    res.json({'message': 'Hello Brother !'})
+    getNews()
+    .then(resp => resp.json())
+    .then(news => {
+      console.log(news)
+      res.json(news)
+    })
+   .catch(err => console.log(err))
 })
 
 router.post('/register', authValidator, (req, res) => {

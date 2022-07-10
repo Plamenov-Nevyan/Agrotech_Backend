@@ -1,12 +1,6 @@
-const {Product} = require('../models/Product')
-const {VehicleAndPart} = require('../models/Agro_Vehicle_Part')
-const {AgroService} = require('../models/Service')
+const {Publication} = require('../models/Publication')
 
-const getAllPublications = () => Promise.all([
-    Product.find().lean(),
-    VehicleAndPart.find().lean(),
-    AgroService.find().lean()
-])
+const getAllPublications = () => Publication.find().lean()
 
 module.exports = {
     getAllPublications

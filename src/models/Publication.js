@@ -1,4 +1,5 @@
 const {Schema, model, Types} = require('mongoose')
+const {Comment} = require('./Comment')
 
 const publicationSchema = new Schema({
     publicationType : {
@@ -69,7 +70,7 @@ const publicationSchema = new Schema({
     ],
     comments : [
         {type: Types.ObjectId,
-          ref: 'Comment'
+          ref: Comment
         }
     ],
     

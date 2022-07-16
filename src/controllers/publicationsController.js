@@ -38,5 +38,22 @@ else{
   res.json(publications)
 }
 })
+router.get('/marketplace/:publicationId', async (req, res) => {
+  try{ 
+    let publication = await publicationServices.getPublicationDetails(req.params.publicationId)
+   res.json(publication)
+  }
+  catch(err){
+    res.json({message : 'Couldn\'t find this publication...'})
+  }
+})
+router.post('/like/:publicationId', async (req, res) => {
+ try{
+   let publication = await publicationServices.likeOrFollowPublication( req.body.action, req.params.publicationId, req.body.userId)
+   req.body.action === 'like' ? res.json(publication.likedBy) : res.json(publication.followedBy)
+ }catch(err){
+  res.json({message:err.message})
+ }
+})
 
 module.exports = router

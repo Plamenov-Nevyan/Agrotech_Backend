@@ -1,4 +1,5 @@
 const {Publication} = require('../models/Publication')
+const {User} = require('../models/User')
 const uploadFile = require('../utils/googleUpload')
 const {sortPublications} = require('../utils/sortPublications')
 
@@ -37,13 +38,44 @@ const getTotalCount = async() => {
     return count
 }
 
+const getPublicationDetails = async(publicationId) => {
+   let publication = await Publication.findOne({_id:publicationId})
+   .populate('owner')
+   .populate('likedBy')
+   .populate('followedBy')
+   .populate('comments')
+   .lean()
+return publication
+}
+
+const likeOrFollowPublication = async (action,publicationId, userId) => {
+  let [publication, user] = await Promise.all([
+    Publication.findOne({_id:publicationId}),
+    User.findOne({_id:userId})
+  ])
+  
+  if(action === 'like'){
+  publication.likedBy.push(userId)
+  user.publicationsLiked.push(publication._id)
+  }
+  else{
+    publication.followedBy.push(userId)
+    user.publicationsFollowed.push(publication._id)
+  }
+  
+  await Promise.all([
+    publication.save(),
+    user.save()
+  ]) 
+  return action === 'like' ? publication.populate('likedBy') : publication.populate('followedBy')
+}
+
 module.exports = {
     createPublication,
     getAllPublications,
     getLimitedPublications,
-    getTotalCount
+    getTotalCount,
+    getPublicationDetails,
+    likeOrFollowPublication
 }
-
-// { count: '' }
-// { skip: '0', limit: '8', sort: 'recent' }
 

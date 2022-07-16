@@ -8,8 +8,6 @@ const auth = new google.auth.GoogleAuth({
     scopes
 })
 const driveService = google.drive({version:'v3', auth})
-
-
 module.exports = (file) => {
     return driveService.files.create({
        media:{

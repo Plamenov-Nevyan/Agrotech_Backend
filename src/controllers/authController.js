@@ -8,14 +8,13 @@ router.get('/', (req, res) => {
     getNews()
     .then(resp => resp.json())
     .then(news => {
-      console.log(news)
       res.json(news)
     })
    .catch(err => console.log(err))
 })
 
 router.post('/register', authValidator, (req, res) => {
-   registerUser(req.body.username, req.body.email, req.body.password)
+   registerUser(req.body)
   .then((user) =>{
      let userData = createSession(user)
      res.json(userData)

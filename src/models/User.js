@@ -13,16 +13,34 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  userType: {
+    type: String,
+    required: true
+  },
+  phoneNumber : {
+    type: Number
+  },
+  uic: {
+    type: Number
+  },
+  publicationsCreated : [
+    {
+      type: Types.ObjectId,
+      ref: 'Publication'
+    }
+  ],
   publicationsFollowed: [
          {
            type: Types.ObjectId,
-           refPath : 'publicationModel' 
+           ref : 'Publication' 
          }
   ],
-  publicationModel : {
-    type: String,
-    enum: ['Agro_Vehicles_Parts', 'Products', 'Services']
-  },
+  publicationsLiked : [
+    {
+      type: Types.ObjectId,
+      ref: 'Publication'
+    }
+  ], 
   notifications: [
     {type: Types.ObjectId,
      ref: 'Notification'

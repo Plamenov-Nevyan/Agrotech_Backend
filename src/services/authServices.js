@@ -8,13 +8,13 @@ exports.ifUserExists =  (username, email) => Promise.all([
    ])
 
 
-exports.registerUser = async (username,email, password) => {
+exports.registerUser = async (userData) => {
         try {
-            let hash = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
+            let hash = await bcrypt.hash(userData.password, Number(process.env.SALT_ROUNDS))
+            userData.password = hash
+            userData.phoneNumber ? delete userData.uic : delete userData.uic
             return User.create({
-                username,
-                email,
-                password: hash
+             ...userData
             })
         } catch (err) {
             throw new Error(err.message)

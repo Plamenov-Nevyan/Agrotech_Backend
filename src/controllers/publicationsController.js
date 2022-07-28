@@ -1,18 +1,20 @@
 const router = require('express').Router()
 const publicationServices = require('../services/publicationServices')
+const createValidator = require('../middlewares/createValidator')
 const multer = require('multer')
 const storage = multer.memoryStorage()
 const upload = multer({storage:storage})
 
-router.post('/create', upload.single('upload'), async (req,res) => {
-  try{
+router.post('/create', upload.single('upload'), createValidator,async (req,res) => {
     req.body.owner = req.user._id
-    let newPublication = await publicationServices.createPublication(req.body, req.file)
-    res.json(newPublication)
+  try{ 
+    await publicationServices.createPublication(req.body, req.file)
+    res.status(203).end()
   }catch(err){
-    res.json({message: err.message})
+    res.status(400).json({message: err.message})
   }
 })
+
 router.get('/marketplace', async (req, res) => {
 if(Object.values(req.query).length > 0){
       if(req.query.hasOwnProperty('count')){
@@ -55,5 +57,20 @@ router.post('/like/:publicationId', async (req, res) => {
   res.json({message:err.message})
  }
 })
+router.post('/add-comment/:publicationId', async (req, res) => {
+   publicationServices.addComment(req.params.publicationId, req.body)
+   .then((publication) => res.json(publication.comments))
+   .catch(err => res.json({message : 'Couldn\'t add the comment'}))
+})
+router.get('/most-recent', async (req, res) => {
+    try{
+      let publications = await publicationServices.getMostRecent()
+    res.json(publications)
+    }
+    catch(err){
+      res.json({message: err.message})
+    }
+})
+
 
 module.exports = router

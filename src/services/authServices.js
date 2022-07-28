@@ -1,6 +1,8 @@
 const { User } = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const uploadFile = require('../utils/googleUpload')
+const fetch = require('node-fetch')
 
 exports.ifUserExists =  (username, email) => Promise.all([ 
     User.exists({ username }).exec(),
@@ -46,4 +48,43 @@ exports.ifUserIsRegistered = async(email, password) => {
     isInfoCorrect = false
    }
   return isInfoCorrect
+}
+
+exports.getUserData = async(userId) => {
+    let user = await User.findById(userId)
+    .populate('publicationsLiked')
+    .populate('publicationsFollowed')
+    .populate('publicationsCreated')
+    return user
+}
+
+exports.addProfilePic = async (userId, profilePic) => {
+   if(typeof profilePic === 'object'){
+    uploadFile(profilePic)
+    .then(async (resp) => {
+        let imageLink = `https://drive.google.com/uc?export=view&id=${resp.data.id}`
+        let user = await User.findById(userId)
+        user.image = imageLink
+        await user.save()
+    })
+    .catch(err => console.log(err))
+   }
+   else {
+      User.findById(userId)
+      .then(async (user) => {
+        user.image = profilePic
+        await user.save()
+      })
+     .catch(err => {throw err})
+   }
+}
+
+exports.checkIfEmailExists = async (email) => {
+    let resp = await fetch(`https://api.emailable.com/v1/verify?email=${email}&api_key=${process.env.EMAIL_VERIFICATION_KEY}`)
+    let data = await resp.json()
+    if(data.state !== 'deliverable'){
+        throw {
+            message : `Email adress doesn\'t exist or it\'s unsafe to use!`
+        }
+    }
 }

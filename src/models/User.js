@@ -17,11 +17,38 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  image: {
+    type: String,
+  },
+  coverImage: {
+    type: String,
+  },
+  shortDescription : {
+    type: String,
+  },
+  about : {
+    type: String,
+  },
   phoneNumber : {
     type: Number
   },
   uic: {
     type: Number
+  },
+  gender : {
+    type : String
+  },
+  location : {
+    type : String
+  },
+  facebookLink : {
+    type: String
+  },
+  tinderLink: {
+    type: String
+  },
+  instagramLink : {
+    type: String
   },
   publicationsCreated : [
     {
@@ -41,6 +68,12 @@ const userSchema = new Schema({
       ref: 'Publication'
     }
   ], 
+  comments : [
+    {
+      type: Types.ObjectId,
+      ref: 'Comment'
+    }
+  ],
   notifications: [
     {type: Types.ObjectId,
      ref: 'Notification'

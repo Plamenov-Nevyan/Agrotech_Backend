@@ -78,5 +78,7 @@ const publicationSchema = new Schema({
 {timestamps: true}
 )
 
+// publicationSchema.index({'$**':'text'})
+
 const Publication = model('Publication', publicationSchema)
 exports.Publication = Publication

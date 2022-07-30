@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const publicationServices = require('../services/publicationServices')
+const commentServices = require('../services/commentServices')
 const createValidator = require('../middlewares/createValidator')
 const multer = require('multer')
 const storage = multer.memoryStorage()
@@ -57,11 +58,7 @@ router.post('/like/:publicationId', async (req, res) => {
   res.json({message:err.message})
  }
 })
-router.post('/add-comment/:publicationId', async (req, res) => {
-   publicationServices.addComment(req.params.publicationId, req.body)
-   .then((publication) => res.json(publication.comments))
-   .catch(err => res.json({message : 'Couldn\'t add the comment'}))
-})
+
 router.get('/most-recent', async (req, res) => {
     try{
       let publications = await publicationServices.getMostRecent()

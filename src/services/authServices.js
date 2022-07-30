@@ -1,4 +1,5 @@
 const { User } = require('../models/User')
+const {Blacklist} = require('../models/Blacklist')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const uploadFile = require('../utils/googleUpload')
@@ -88,3 +89,7 @@ exports.checkIfEmailExists = async (email) => {
         }
     }
 }
+
+exports.blacklistToken = (token) => Blacklist.create({token})
+
+exports.checkIfTokenIsRevoked = (token) => Blacklist.findOne({token})

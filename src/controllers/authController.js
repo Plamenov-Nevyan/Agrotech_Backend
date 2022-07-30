@@ -1,5 +1,12 @@
 const router = require('express').Router()
-const {registerUser, createSession, loginUser, getUserData, addProfilePic} = require('../services/authServices')
+const {
+   registerUser, 
+   createSession, 
+   loginUser, 
+   getUserData, 
+   addProfilePic,
+   blacklistToken
+} = require('../services/authServices')
 const authValidator = require('../middlewares/authValidator')
 const {getNews} = require('../services/newsService')
 const multer = require('multer')
@@ -31,6 +38,12 @@ router.post('/login', authValidator,(req,res) => {
     res.json(userData)
  })
  .catch(err => res.status(400).json({message: err.message}))
+})
+
+router.get('/logout', (req, res) => {
+  blacklistToken(req.token)
+  .then(() => res.status(200).json({message : 'Logout is successfull !'}))
+  .catch(err => res.status(500).json({message : 'Sorry, an internal error has occured !'}))
 })
 
 router.get('/users/profile/:userId', (req,res) => {

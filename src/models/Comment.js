@@ -8,8 +8,12 @@ const commentSchema = new Schema({
     author : {
         type: Types.ObjectId,
         ref: 'User'
+    },
+    forPublication : {
+        type: Types.ObjectId,
+        ref: 'Publication'
     }
-})
+},{timestamps:true})
 
 const Comment = model('Comment', commentSchema)
 exports.Comment = Comment

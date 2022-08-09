@@ -16,6 +16,15 @@ router.post('/create', upload.single('upload'), createValidator,async (req,res) 
   }
 })
 
+router.put('/edit/:publicationId',upload.single('upload'), createValidator, async (req, res) => {
+  try{ 
+    await publicationServices.editPublication(req.body, req.file, req.params.publicationId)
+    res.status(203).end()
+  }catch(err){
+    res.status(400).json({message: err.message})
+  }
+})
+
 router.get('/marketplace', async (req, res) => {
 if(Object.values(req.query).length > 0){
       if(req.query.hasOwnProperty('count')){

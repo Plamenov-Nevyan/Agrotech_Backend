@@ -1,4 +1,5 @@
 const {Publication} = require('../models/Publication')
+const {Notification} = require('../models/Notification')
 const {User} = require('../models/User')
 const {Comment} = require('../models/Comment')
 const uploadFile = require('../utils/googleUpload')
@@ -20,6 +21,33 @@ const createPublication = async (publicationData, publicationImage) => {
         })
         .catch(err => {throw err})
 }
+
+const editPublication = async (publicationData, publicationImage, publicationId) => {
+   if(publicationImage){
+     uploadFile(publicationImage)
+     .then(async (resp) => {
+      let imageLink = `https://drive.google.com/uc?export=view&id=${resp.data.id}`
+      let publication = await Publication.findByIdAndUpdate({
+          ...publicationData,
+          image:imageLink
+      })
+  })
+  .catch(err => {throw err})
+}
+else {
+  delete publicationData.followedBy
+  delete publicationData.owner
+   try {
+    let publication = await Publication.findByIdAndUpdate(publicationId, {
+        ...publicationData
+    })
+   }
+   catch(err){
+    throw err
+   }
+  }
+}
+
 const getAllPublications = () => Publication.find().lean()
 
 const getLimitedPublications = async (query) => {
@@ -164,6 +192,7 @@ module.exports = {
     getPublicationDetails,
     likeOrFollowPublication,
     addComment,
-    getMostRecent
+    getMostRecent,
+    editPublication
 }
 

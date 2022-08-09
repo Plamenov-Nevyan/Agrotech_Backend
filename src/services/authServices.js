@@ -34,7 +34,7 @@ exports.createSession = (user) => {
         email: payload.email,
         _id: payload._id,
         accessToken,
-        shoppingCart: []
+        // shoppingCart: []
     }
 }
 
@@ -92,4 +92,4 @@ exports.checkIfEmailExists = async (email) => {
 
 exports.blacklistToken = (token) => Blacklist.create({token})
 
-exports.checkIfTokenIsRevoked = (token) => Blacklist.findOne({token})
+exports.checkIfTokenIsRevoked = (receivedToken) => Blacklist.findOne({token : receivedToken})

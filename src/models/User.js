@@ -1,4 +1,4 @@
-const {Schema, model, Types} = require('mongoose')
+const {Schema, model, Types, ObjectId} = require('mongoose')
 
 const userSchema = new Schema({
     username: {
@@ -19,6 +19,7 @@ const userSchema = new Schema({
   },
   image: {
     type: String,
+    default : `https://drive.google.com/uc?export=view&id=1iMt8_whGlwVVfGofzNKVf7O9bwrNdjnt`
   },
   coverImage: {
     type: String,
@@ -41,15 +42,7 @@ const userSchema = new Schema({
   location : {
     type : String
   },
-  facebookLink : {
-    type: String
-  },
-  tinderLink: {
-    type: String
-  },
-  instagramLink : {
-    type: String
-  },
+ links : {},
   publicationsCreated : [
     {
       type: Types.ObjectId,
@@ -74,16 +67,22 @@ const userSchema = new Schema({
       ref: 'Comment'
     }
   ],
-  notifications: [
-    {type: Types.ObjectId,
-     ref: 'Notification'
-    }
-  ],
-  messages: [
-    {type: Types.ObjectId,
-     ref: 'Message'
-    }
-  ]
+  notifications: [],
+  messages: [{
+      _id : {type : String},
+      sender : {
+        type : Types.ObjectId,
+        ref : 'User'
+      },
+      receiver : {
+        type : Types.ObjectId,
+        ref : 'User'
+      },
+      content : {type : String},
+      msgType : {type : String},
+         read : {type : Boolean},
+      createdAt : {type : Date, default : Date.now()}
+  }]
 })
 
 const User = model('User', userSchema)

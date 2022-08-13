@@ -16,7 +16,7 @@ app.use(routes)
 let server = http.createServer(app)
 
 dbConnect()
-.then(() => server.listen(port, console.log(`Server running on port ${port}...`)))
+.then(() => app.listen(port, console.log(`Server running on port ${port}...`)))
 .catch(err => console.log('The attempt of connecting to the database has failed...'))
 
 

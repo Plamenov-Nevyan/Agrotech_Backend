@@ -41,6 +41,7 @@ router.post('/login', authValidator,(req,res) => {
 })
 
 router.get('/logout', (req, res) => {
+ 
   blacklistToken(req.token)
   .then(() => res.status(200).json({message : 'Logout is successfull !'}))
   .catch(err => res.status(500).json({message : 'Sorry, an internal error has occured !'}))
@@ -53,7 +54,6 @@ router.get('/users/profile/:userId', (req,res) => {
 })
 
 router.post('/users/add-prof-pic/:userId', upload.any('file'), (req, res) => {
-   console.log(req.file)
     if(req.file){
       addProfilePic(req.params.userId, req.file)    
       .then(() => res.status(200))

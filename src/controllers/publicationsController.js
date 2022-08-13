@@ -25,6 +25,15 @@ router.put('/edit/:publicationId',upload.single('upload'), createValidator, asyn
   }
 })
 
+router.delete('/delete/:publicationId', async (req, res) => {
+  try {
+    let publicationToDelete = await publicationServices.deletePublication(req.params.publicationId)
+    res.json(publicationToDelete)
+  }catch(err){
+    res.status(500).json({message : 'Opps something went wrong, couldn\'t delete your publication...'})
+  }
+})
+
 router.get('/marketplace', async (req, res) => {
 if(Object.values(req.query).length > 0){
       if(req.query.hasOwnProperty('count')){
@@ -76,6 +85,39 @@ router.get('/most-recent', async (req, res) => {
     catch(err){
       res.json({message: err.message})
     }
+})
+
+router.get('/get-for-shopping-cart', async (req, res) => {
+  try{
+    let products = await publicationServices.getForShoppingCart(req.query.itemIds.includes(',')
+    ? req.query.itemIds.split(',')
+    : req.query.itemIds
+    )
+    res.json(products)
+  }catch(err){
+    res.status(500).json({message : 'Something went wrong when retrieving your products, try to refresh the page !'})
+  }
+})
+
+router.get('/get-for-sell', async (req, res) => {
+  try{
+    let publications = await publicationServices.getForSell(req.query.publicationIds.includes(',')
+    ? req.query.publicationIds.split(',')
+    : req.query.publicationIds
+    )
+    res.json(publications)
+  }catch(err){
+    res.status(500).json({message : 'Something went wrong when retrieving products for sell, try to refresh the page !'})
+  }
+})
+
+router.post('/sell/:publicationId', async (req, res) => {
+   try{
+    let data = await publicationServices.sellProduct(req.params.publicationId, req.body.quantityToSell, req.body.buyer._id)
+    res.json(data)
+  }catch(err){
+    res.status(500).json({message : 'Server was not able to process sell request, try again please!'})
+  }
 })
 
 

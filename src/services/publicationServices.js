@@ -4,6 +4,7 @@ const {User} = require('../models/User')
 const {Comment} = require('../models/Comment')
 const uploadFile = require('../utils/googleUpload')
 const {sortPublications} = require('../utils/sortPublications')
+const removeFromFollowedAndLiked = require('../utils/removeFromFollowedAndLiked')
 
 const createPublication = async (publicationData, publicationImage) => {
     uploadFile(publicationImage)
@@ -48,12 +49,26 @@ else {
   }
 }
 
+const deletePublication = async (publicationId) => {
+  try { 
+    let publicationToDelete = await Publication.findById(publicationId)
+   await Promise.all([
+    removeFromFollowedAndLiked(publicationToDelete),
+    Notification.deleteMany({forPublication : publicationId}),
+    Publication.findByIdAndRemove(publicationId)
+   ])
+   return publicationToDelete
+  }catch(err){
+    throw err
+  }
+}
+
 const getAllPublications = () => Publication.find().lean()
 
 const getLimitedPublications = async (query) => {
    let noMoreRemaining = false
    let count = query.category ? await getTotalCount(query.category, '') : await getTotalCount('',query.search)
-   count = count - Number(query.skip)
+   count =  count - Number(query.skip)
    let publications
 
   if(count <= Number(query.limit)){
@@ -80,7 +95,6 @@ const getLimitedPublications = async (query) => {
           : await Publication.find().skip(Number(query.skip)).limit(Number(query.limit)).lean()
     }
     else if(query.search){
-          // publications = await Publication.find({$text:{$search:query.search}}).skip(Number(query.skip)).limit(Number(query.limit)).lean()
           publications = await Publication.find({$or :[
             {name: {$regex : `${query.search}`, $options : 'i'}},
             {model: {$regex : `${query.search}`, $options : 'i'}},
@@ -89,6 +103,7 @@ const getLimitedPublications = async (query) => {
     }
     count = count - publications.length
   }
+  publications = sortPublications(query.sort, publications)
    return({publications, count, noMoreRemaining})
 }
 
@@ -179,9 +194,53 @@ const addComment = async(publicationid, commentData) => {
     }
   })
 }
+
 const getMostRecent = async() => {
   let publications = await Publication.find().sort({createdAt:-1}).limit(3)
   return publications
+}
+
+const getForShoppingCart = async(itemIds) => {
+  try{
+    let products = await Publication.find(
+      {_id : {$in : itemIds}}
+    ).populate('owner')
+   
+    return products
+  }catch(err){
+    throw err
+  }
+}
+
+const getForSell = async(publicationIds) => {
+  try{
+    let products = await Publication.find(
+      {_id : {$in : publicationIds}}
+    ).populate('owner')
+    return products
+  }catch(err){
+    throw err
+  }
+}
+
+const sellProduct = async (productId, quantityToSell, buyerId) => {
+ try{
+  let [product, buyer] = await Promise.all([
+    Publication.findById(productId),
+    User.findById(buyerId)
+  ])
+  buyer.productsBought.push({
+    publication : product,
+    quantityBought : quantityToSell
+ })
+ await buyer.save()
+    product.quantity = product.quantity - quantityToSell
+    await product.save()
+    return  product
+    
+ }catch(err){
+  throw err
+ }
 }
 
 module.exports = {
@@ -193,6 +252,10 @@ module.exports = {
     likeOrFollowPublication,
     addComment,
     getMostRecent,
-    editPublication
+    editPublication,
+    deletePublication,
+    getForShoppingCart,
+    getForSell,
+    sellProduct
 }
 

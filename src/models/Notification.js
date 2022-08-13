@@ -15,9 +15,11 @@ const notificationSchema = new Schema({
         type: Types.ObjectId,
         ref: 'Publication'
     },
+    deletedPublication : {},
     read : {
         type : Boolean
     },
+    publicationsToBuy : [],
     expireAt: {
         type: Date,
         default: new Date(),

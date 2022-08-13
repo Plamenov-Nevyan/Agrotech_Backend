@@ -16,11 +16,10 @@ router.get('/get-recent/:userId', (req,res) => {
 router.get('/get-all/:userId', (req,res) => {
    notificationServices.getUserNotificationsOnLoad(req.params.userId, req.query)
    .then((notifications) => res.json(notifications))
-   .catch(err => {console.log(err);res.status(400).json({message:'Sorry, couldn\'t get your notifications..'})})
+   .catch(err => res.status(400).json({message:'Sorry, couldn\'t get your notifications..'}))
 }),
 
 router.post('/read/', (req, res) => {
-   console.log(req.body)
    notificationServices.markAsRead(req.body) 
    .then(updatedNotifications => {
       res.json(updatedNotifications)

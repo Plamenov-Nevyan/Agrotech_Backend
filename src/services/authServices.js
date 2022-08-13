@@ -27,14 +27,13 @@ exports.registerUser = async (userData) => {
 exports.loginUser = (email) => User.findOne({email})
 
 exports.createSession = (user) => {
-    let payload = {...user._doc}
+    let payload = {email : user.email, username : user.username, _id : user._id}
     let accessToken = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn:'1d'})
     return {
         username: payload.username,
         email: payload.email,
         _id: payload._id,
         accessToken,
-        // shoppingCart: []
     }
 }
 
@@ -68,7 +67,7 @@ exports.addProfilePic = async (userId, profilePic) => {
         user.image = imageLink
         await user.save()
     })
-    .catch(err => console.log(err))
+    .catch(err =>{ throw err})
    }
    else {
       User.findById(userId)

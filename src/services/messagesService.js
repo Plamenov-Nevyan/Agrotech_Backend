@@ -1,5 +1,6 @@
 const {User} = require('../models/User')
 const {v4 : uuidv4} = require('uuid')
+let sendmail = require('sendmail')()
 
 const getRecent = async (userId) => {
     let user = await User.findById(userId).populate({
@@ -8,13 +9,20 @@ const getRecent = async (userId) => {
             path : 'sender',
             model : 'User'
         }
-    })
+    }).populate({
+      path : 'messages',
+      populate : {
+          path : 'receiver',
+          model : 'User'
+      }
+  })
     let messages 
    if(user.messages.length > 0){
     messages = user.messages
       .filter(message => message.msgType === 'received')
+      .filter(message => message.read === false)
       .sort((a,b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
-    messages.length >= 5 ? messages = messages.slice(0, 5) : messages
+    messages.length >= 10 ? messages = messages.slice(0, 10) : messages
    }
    else {messages = []}
    return messages
@@ -28,15 +36,27 @@ const markAsRead = async (messagesId, userId) => {
             model : 'User'
         }
      }) 
-     
-      user.messages.forEach(message => {  
-        if(messagesId.includes(message._id)){
-        message.read = true
-        }
-    }
- )
+     if(Array.isArray(messagesId)){
+          user.messages.forEach(message => {  
+            messagesId.includes(message._id)
+              ? message.read = true
+              : null
+          })
+     }
+     else{
+         let messageToMark = user.messages.find(message => message._id === messagesId)
+         messageToMark.read = true
+         let indexOfMsgToMark = user.messages.indexOf(messageToMark)
+         user.messages.splice(indexOfMsgToMark, 1, messageToMark)
+     }
  await user.save()
- return user.messages
+
+  user.messages = user.messages
+  .filter(message => message.msgType === 'received')
+  .filter(message => message.read === false)
+  .sort((a,b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+  
+  return user.messages
 }
 
 const sendMessage = async (data) => {
@@ -107,28 +127,22 @@ const getTranscript = async (contactId, userId) => {
  return transcript
 }
 
-const checkForNew = async (userId, currentCount, contactId) => {
-   let user = await User.findById(userId)
-   .populate({
-    path : 'messages',
-    populate : {
-        path : 'sender',
-        model : 'User'
-    }
- })
- .populate({
-  path : 'messages',
-  populate : {
-      path : 'receiver',
-      model : 'User'
-  }
-})
-   user.messages = user.messages.filter(message => message.sender._id == contactId || message.receiver._id == contactId)
-   console.log(user.messages.length)
-   console.log(currentCount)
-   let areThereNew = user.messages.length > currentCount 
-   return areThereNew ? user.messages.slice(currentCount) : []
+const sendEmail = (sender, subject, content) => {
+try{  
+  sendmail({
+    from : sender,
+    to : 'plamenovnevyan@gmail.com',
+    subject,
+    html : content
+  }, (err, reply) => {
+    if(err){throw err}
+    return {resp : 'Email was sent successfully, expect a reply soon!'}
+  })
+}catch(err){
+  throw err
 }
+}
+
 
 module.exports = {
     getRecent, 
@@ -136,5 +150,5 @@ module.exports = {
     sendMessage,
     getRecentUnique,
     getTranscript,
-    checkForNew
+    sendEmail
 }

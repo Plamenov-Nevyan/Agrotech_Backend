@@ -11,7 +11,7 @@ router.get('/get-recent/:userId', async (req, res) => {
 })
 
 router.post('/read/:userId', (req, res) => {
-    messageServices.markAsRead(req.body, req.params.userId)
+    messageServices.markAsRead(req.body.data, req.params.userId)
     .then(updatedMessages => res.json(updatedMessages))
     .catch(err => res.status(400).json({message : 'Sorry, couldn\'t get your messages..'}))
 })
@@ -40,15 +40,18 @@ router.get('/get-transcript/:contactId/:userId', async(req, res) => {
       let transcript = await messageServices.getTranscript(req.params.contactId, req.params.userId)
       res.json(transcript)
     }catch(err){
-      console.log(err)
       res.status(500).json({message : 'Sorry, couldn\'t get the communcation data'})
     }
 })
 
-router.get('/check-new/:userId', (req, res) => {
-  messageServices.checkForNew(req.params.userId, req.query.count, req.query.contactId)
-  .then(newMessages => res.json(newMessages))
-  .catch(err => res.status(500).json({message : 'Sorry, couldn\'t check for new messages...'}))
+router.post('/contact-by-email', (req, res) => {
+   try{
+    let resp = messageServices.sendEmail(req.body.sender, req.body.subject, req.body.content)
+    res.json(resp)
+  }
+   catch(err) {
+    res.status(400).json({message : 'Ooops, something went wrong.. try sending an email again please !'})
+  }
 })
 
 module.exports = router

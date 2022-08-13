@@ -54,6 +54,7 @@ const publicationSchema = new Schema({
     serviceType: {
         type: String,
     },
+    availableUntil : {type : String},
     owner : {
         type: Types.ObjectId,
         ref: 'User'

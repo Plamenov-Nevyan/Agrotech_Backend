@@ -49,6 +49,10 @@ const userSchema = new Schema({
       ref: 'Publication'
     }
   ],
+  productsBought : [{
+    publication : {},
+    quantityBought : {type : Number}
+  }],
   publicationsFollowed: [
          {
            type: Types.ObjectId,
@@ -67,7 +71,6 @@ const userSchema = new Schema({
       ref: 'Comment'
     }
   ],
-  notifications: [],
   messages: [{
       _id : {type : String},
       sender : {

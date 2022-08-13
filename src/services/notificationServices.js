@@ -38,7 +38,6 @@ const getUserNotificationsOnLoad = async (userId, queryParams) => {
 }
 
 const markAsRead = async (notificationsId, userId) => {
-  console.log(notificationsId)
    await Notification.updateMany(
         { _id: { $in: notificationsId } },
         { $set: { read : true } },

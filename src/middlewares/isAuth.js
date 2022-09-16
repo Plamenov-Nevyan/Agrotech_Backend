@@ -17,7 +17,6 @@ module.exports = (req, res, next) => {
                 }
              
             })
-            if(req.path === '/logout'){req.token = accessToken}
             next()
         })
     .catch(err => res.status(500).json({message: 'Sorry, an internal error has occured'})) 

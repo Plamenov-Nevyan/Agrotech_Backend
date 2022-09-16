@@ -1,20 +1,36 @@
-exports.sortPublications = (sortType, publications) => {
+exports.sortPublications = (sortType) => {
+  let parameters;
     if(sortType == 'oldest'){
-        return publications.sort((a,b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+         parameters = {
+            'createdAt' : 1
+         };
       }
-      else if(sortType == 'recent'){
-        return publications.sort((a,b) => Date.parse(a.createdAt) - Date.parse(b.createdAt))
+      else if(sortType == 'mostRecent'){
+        parameters = {
+          'createdAt' : -1
+       }
       }
       else if(sortType === 'mostPopular') {
-        return publications.sort((a,b) => b.likedBy.length + b.followedBy.length - a.likedBy.length + a.followedBy.length)
+        parameters = {
+          'followedBy' : -1,
+          'likedBy' : -1
+       };
       }
       else if(sortType === 'leastPopular'){
-        return publications.sort((a,b) => a.likedBy.length + a.followedBy.length - b.likedBy.length + b.followedBy.length)
+        parameters = {
+          'followedBy' : 1,
+          'likedBy' : 1
+       };
       }
       else if(sortType = 'mostExpensive'){
-        return publications.sort((a,b) => a.price  - b.price)
+        parameters = {
+          'price' : -1
+       };
       }
       else if(sortType = 'cheapest'){
-        return publications.sort((a,b) => b.price - a.price)
-      }
+        parameters = {
+          'price' : 1
+       };
+      };
+   return parameters;
 }

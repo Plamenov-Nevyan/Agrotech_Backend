@@ -42,7 +42,7 @@ router.post('/login', authValidator,(req,res) => {
 
 router.get('/logout', (req, res) => {
  
-  blacklistToken(req.token)
+  blacklistToken(req.user.accessToken)
   .then(() => res.status(200).json({message : 'Logout is successfull !'}))
   .catch(err => res.status(500).json({message : 'Sorry, an internal error has occured !'}))
 })

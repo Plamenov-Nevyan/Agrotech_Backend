@@ -66,6 +66,7 @@ const deletePublication = async (publicationId) => {
 const getAllPublications = () => Publication.find().lean()
 
 const getLimitedPublications = async (query) => {
+   let sortParameters = sortPublications(query.sort)
    let noMoreRemaining = false
    let count = query.category ? await getTotalCount(query.category, '') : await getTotalCount('',query.search)
    count =  count - Number(query.skip)
@@ -74,16 +75,21 @@ const getLimitedPublications = async (query) => {
   if(count <= Number(query.limit)){
     if(query.category){
           publications =  query.category !== 'all'
-          ? await Publication.find({publicationType: query.category}).skip(Number(query.skip)).lean() 
-          : await Publication.find().skip(Number(query.skip)).lean()
+          ? await Publication.find({publicationType: query.category})
+          .skip(Number(query.skip))
+          .lean() 
+          : await Publication.find()
+          .skip(Number(query.skip))
+          .lean()
     }
     else if (query.search){
-          // publications = await Publication.find({$text:{$search:query.search}}).skip(Number(query.skip)).lean()
           publications = await Publication.find({$or :[
             {name: {$regex : `${query.search}`, $options : 'i'}},
             {model: {$regex : `${query.search}`, $options : 'i'}},
             {serviceType: {$regex : `${query.search}`, $options : 'i'}},
-          ]}).skip(Number(query.skip)).lean()
+          ]})
+          .skip(Number(query.skip))
+          .lean()
     }
     count = 0
     noMoreRemaining = true
@@ -91,8 +97,14 @@ const getLimitedPublications = async (query) => {
   else{
     if(query.category){
           publications = query.category !== 'all'
-          ? await Publication.find({publicationType: query.category}).skip(Number(query.skip)).limit(Number(query.limit)).lean()
-          : await Publication.find().skip(Number(query.skip)).limit(Number(query.limit)).lean()
+          ? await Publication.find({publicationType: query.category})
+          .skip(Number(query.skip)).limit(Number(query.limit))
+          .lean()
+          : await Publication.find()
+          .sort(sortParameters)
+          .skip(Number(query.skip))
+          .limit(Number(query.limit)).lean()
+      
     }
     else if(query.search){
           publications = await Publication.find({$or :[
@@ -103,7 +115,7 @@ const getLimitedPublications = async (query) => {
     }
     count = count - publications.length
   }
-  publications = sortPublications(query.sort, publications)
+
    return({publications, count, noMoreRemaining})
 }
 

@@ -92,9 +92,10 @@ const getRecentUnique = async (userId) => {
 
 let messagesFiltered = []
   user.messages.forEach(message => {
-    let isAddedAlready = messagesFiltered.some(messageFiltered => 
-      messageFiltered.sender._id === message.sender._id || messageFiltered.receiver._id === message.receiver._id
+    let isAddedAlready = messagesFiltered.some(messageFiltered => messageFiltered.receiver._id === message.receiver._id || messageFiltered.sender._id === message.sender._id 
+          
       )
+
     if(!isAddedAlready){
         messagesFiltered.push(message)
     }
@@ -104,7 +105,8 @@ let messagesFiltered = []
 }
 
 const getTranscript = async (contactId, userId) => {
-   let user = await User.findById(userId)
+   try{
+    let user = await User.findById(userId)
    .populate({
     path : 'messages',
     populate : {
@@ -125,6 +127,9 @@ const getTranscript = async (contactId, userId) => {
  .sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt))
 
  return transcript
+  }catch(err){
+    throw err
+  }
 }
 
 const sendEmail = (sender, subject, content) => {

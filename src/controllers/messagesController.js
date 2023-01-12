@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const messageServices = require('../services/messagesService')
+const {checkIfEmailExists} = require('../services/authServices')
 
 router.get('/get-recent/:userId', async (req, res) => {
   try {
@@ -45,13 +46,13 @@ router.get('/get-transcript/:contactId/:userId', async(req, res) => {
 })
 
 router.post('/contact-by-email', (req, res) => {
-   try{
-    let resp = messageServices.sendEmail(req.body.sender, req.body.subject, req.body.content)
-    res.json(resp)
-  }
-   catch(err) {
-    res.status(400).json({message : 'Ooops, something went wrong.. try sending an email again please !'})
-  }
+  console.log(`aa`)
+    checkIfEmailExists(req.body.sender)
+   .then(() => {
+    messageServices.sendEmail(req.body.sender, req.body.subject, req.body.content)
+    res.status(203).end()
+   })
+   .catch(err => res.status(400).json({message : err.message}))
 })
 
 module.exports = router

@@ -1,6 +1,15 @@
 const {User} = require('../models/User')
 const {v4 : uuidv4} = require('uuid')
-let sendmail = require('sendmail')()
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport({
+  service: 'gmail', 
+  port: 2525,
+  secure: true,
+  auth: {
+    user: process.env.GoogleUsername,
+    pass: process.env.GooglePass
+  },
+});
 
 const getRecent = async (userId) => {
     let user = await User.findById(userId).populate({
@@ -133,15 +142,20 @@ const getTranscript = async (contactId, userId) => {
 }
 
 const sendEmail = (sender, subject, content) => {
-try{  
-  sendmail({
+  let mailOptions = {
     from : sender,
     to : 'plamenovnevyan@gmail.com',
-    subject,
-    html : content
-  }, (err, reply) => {
-    if(err){throw err}
-    return {resp : 'Email was sent successfully, expect a reply soon!'}
+    subject : subject,
+    html : `
+    <h3>From : ${sender}</h3>
+    <p>${content}</p>
+    `
+  }
+try{  
+  transporter.sendMail(mailOptions, (err, info) => {
+    if(err){
+        throw {message : err.message}
+    }
   })
 }catch(err){
   throw err

@@ -17,7 +17,7 @@ const validatorHandlers = {
             isUsernameValid(reqBody.username)
             isEmailValid(reqBody.email)
             isPasswordValid(reqBody.password, reqBody.confirm)
-            // await checkIfEmailExists(reqBody.email)
+            await checkIfEmailExists(reqBody.email)
             let [isUsernameTaken, isEmailTaken] = await ifUserExists(reqBody.username, reqBody.email)
             if(isUsernameTaken){
                 throw new Error('Username is already taken...')
